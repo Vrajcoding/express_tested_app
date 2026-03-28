@@ -4,11 +4,9 @@ import itemRoutes from "./routes/itemRoutes.js";
 export const app = express();
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
 
 app.use("/items", itemRoutes);
+
 
 if (process.env.NODE_ENV !== "test") {
   app.listen("3000", () => {
