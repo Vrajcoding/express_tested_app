@@ -1,7 +1,3 @@
-// get
-// post 
-// delete
-
 let items = [];
 let itemId = 1;
 
