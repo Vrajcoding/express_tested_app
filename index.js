@@ -1,17 +1,21 @@
 import express from "express";
-import itemRoutes from "./routes/itemRoutes.js";
+import itemRoutes from "./routes/itemRoutes.js"
+import errorMiddleware from "./middlewares/errorMiddlware.js";
+import connectDB from "./config/db.js";
 
+connectDB();
 export const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({
-    name : "vraj"
+    name: "vraj"
   })
 })
 
 app.use("/items", itemRoutes);
 
+app.use(errorMiddleware);
 
 if (process.env.NODE_ENV !== "test") {
   app.listen("3000", () => {
