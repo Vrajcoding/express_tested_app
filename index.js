@@ -2,8 +2,12 @@ import express from "express";
 import itemRoutes from "./routes/itemRoutes.js"
 import errorMiddleware from "./middlewares/errorMiddlware.js";
 import connectDB from "./config/db.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-connectDB();
+if (process.env.NODE_ENV !== "test") {
+  connectDB();
+}
 export const app = express();
 app.use(express.json());
 
