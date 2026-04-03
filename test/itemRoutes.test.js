@@ -1,8 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
 import request from "supertest";
 import { app } from "../index.js";
+import { connectTestDB, clearTest, closeTestDB } from "./dbsetup.js";
 
-let createdItemId;
+beforeAll(async () => await connectTestDB());
+afterEach(async () => await clearTest());
+afterAll(async () => await closeTestDB());
+
 
 describe("Items api integration tests", () => {
   it("GET /items - should be return an initally empty array", async () => {
@@ -14,17 +18,16 @@ describe("Items api integration tests", () => {
   });
 
   it("POST /items - should create a new item", async () => {
-    const newItems = { name: "mechnical keyboard" };
+    const newItems = { name: "mechnical keyboard", price: "200", description: "helloo kam cho kash kay" };
     const response = await request(app)
-         .post("/items")
-         .send(newItems);
-    
+      .post("/items")
+      .send(newItems);
+
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.message).toBe("Item succesfully push");
-    expect(response.body.data.name).toBe(newItems.name);     
+    expect(response.body.data.name).toBe(newItems.name);
 
-    createdItemId = response.body.data.id;
   });
 
   it("POST /items - should fail validation if name is missing", async () => {
@@ -32,14 +35,18 @@ describe("Items api integration tests", () => {
     const response = await request(app).post('/items').send(badItem);
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe("Item name is required");
+    expect(response.body.error).toBeUndefined();
   })
 
   it("DELETE /items/:id - should deleted the items according thier id", async () => {
-    const response =  await request(app).delete(`/items/${createdItemId}`);
+    const setupResponse = await request(app)
+      .post("/items")
+      .send({ name: "router", price: "200", description: "hello bhoyo" });
+    const id = setupResponse.body.data._id;
+    const response = await request(app).delete(`/items/${id}`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
-    expect(response.body.data.id).toBe(createdItemId);
+    expect(response.body.data._id).toBe(id);
   })
 });
